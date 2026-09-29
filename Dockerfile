@@ -3,22 +3,24 @@ FROM dart:stable AS build
 
 WORKDIR /app
 
-# Ativa globalmente a CLI do Dart Frog e configura o PATH do sistema Linux
+# Ativa globalmente a ferramenta oficial do Dart Frog
 RUN dart pub global activate dart_frog_cli
+
+# Injeta a pasta de binários global no PATH do sistema operacional Linux
 ENV PATH="${PATH}:/root/.pub-cache/bin"
 
-# Copia as dependências e executa o pub get
+# Copia as definições de pacotes do projeto
 COPY pubspec.yaml ./
 RUN dart pub get
 
-# Copia todo o código-fonte (routes, lib, database, etc.)
+# Copia todo o código-fonte local do projeto (routes/api/, lib/, etc.)
 COPY . .
 
-# 🌟 O SEGREDO PARA SUBPASTAS: Garante que os arquivos gerados herdem 
-# o mapeamento limpo de rotas internas antes da compilação nativa
-RUN dart pub global run dart_frog_cli build
+# 🌟 CORREÇÃO: Executa o construtor diretamente pelo caminho do sistema.
+# Isso vai mapear e compilar as suas subpastas (/api/login, etc.) sem falhas no Docker.
+RUN dart_frog build
 
-# Compila o executável nativo AOT de produção estável
+# Compila o executável binário estático nativo de produção (AOT)
 RUN dart compile exe build/bin/server.dart -o build/bin/server
 
 # 2. Estágio de Execução (Gera a imagem de produção ultra leve)
