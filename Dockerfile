@@ -27,7 +27,7 @@ RUN dart compile exe build/bin/server.dart -o build/bin/server
 FROM subfuzion/dart:slim
 
 COPY --from=build /app/build/bin/server /app/bin/server
-//COPY --from=build /app/public /app/public
+#COPY --from=build /app/public /app/public
 
 EXPOSE 8080
 
